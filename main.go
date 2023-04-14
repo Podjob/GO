@@ -2,159 +2,198 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
+	//"runtime/debug"
 	"math"
+	"math/big"
 )
 
+func main() {
+
+	//Rounding()
+	// Float_ex()
+	// Rat_ex()
+	//fmt.Println(ulp())
+	//ulp()
+	fmt.Println(fid())
+	fmt.Println(dif())
+	pog()
+
+}
+func dif() float64{
+    var d float64 = 0
+    for i:= 1000000.00; i>=1; i--{
+        d+=1/i
+    }
+    return d
+}
+func fid() float64{
+    var d float64 = 0
+    for i:=1.00; i<1000000; i++ {
+        d+=1/i
+    }
+    return d
+}
+
+func pog(){
+    fmt.Println((ulp()/2*1000000)/(1 - ulp()/2*1000000))
+}
+// надо написать что-то окр(а+б) = (а+б)(1+f)// где |f|<=u // u= ulp/2
 var a float32 = 0.1
 var b float32 = 0.2
 var c float32 = 0.3
 
-func f1() (a2 string, b2 string, c2 string) {
+var x float64 = 1.00
+var y float64 = 2.00
 
-	var a1 uint32 = math.Float32bits(a)
-	//fmt.Println(a1)
-	a2 = fmt.Sprintf("%032b", a1)
-	//fmt.Println(a2)
+func ulp() (fot float64) {
 
-	var b1 uint32 = math.Float32bits(b)
-	//fmt.Println(b1)
-	b2 = fmt.Sprintf("%032b", b1)
-	//fmt.Println(b2)
+	var x2 string
+	var x1 uint64 = math.Float64bits(x)
+	//fmt.Println(x1)
+	x2 = fmt.Sprintf("%064b", x1)
+	//fmt.Println(x2)
 
-	var c1 uint32 = math.Float32bits(c)
-	//fmt.Println(c1)
-	c2 = fmt.Sprintf("%032b", c1)
-	//fmt.Println(c2)
+	bin_x := x2[1:12]
 
-	return
-}
+	var E_x float64 = 0
+	var s float64 = 1
 
-func E() (E1 int64, E2 int64, E3 int64) {
+	//f := math.Inf(1)
+	//fmt.Println(f)
 
-	i, j, k := f1()
-	bin_a := i[1:9]
-	bin_b := j[1:9]
-	bin_c := k[1:9]
+	//fmt.Println(bin_x)
 
-	/*	fmt.Println(len(bin_a))
-		fmt.Println(len(bin_b))
-		fmt.Println(len(bin_c))
+	//strings.Contains("something", "some")
 
-		fmt.Println(bin_a)
-		fmt.Println(bin_b)
-		fmt.Println(bin_c)
-	*/
-	var s1, s2, s3 int64 = 1, 1, 1
+	if bin_x == "00000000000" {
+		var fot float64
+		ULP := math.Pow(2, -1074)
+		//fmt.Println(ULP)
+		fot = ULP
+		return fot
 
-	for i := len(bin_a) - 1; i >= 0; i-- {
-		if bin_a[i] == '1' {
-			E1 += s1
-		}
-		s1 *= 2
-	}
-	//fmt.Println(E1)
+	} else if bin_x == "11111111111" && !strings.Contains(x2[12:], "1") {
+		//1. если после 11 единиц идет 52 нуля, то возвращаяем бескончность
+		//fmt.Println("бесконечность")
+		//var fot float64
+		//f := math.Inf(1)
+		//fmt.Println(f)
+		//fot := f
+		return math.Inf(1)
 
-	for i := len(bin_b) - 1; i >= 0; i-- {
-		if bin_b[i] == '1' {
-			E2 += s2
-		}
-		s2 *= 2
-	}
-	//fmt.Println(E2)
+	} else if bin_x == "11111111111" && strings.Contains(x2[12:], "1") {
+		//2. если после 11 единиц идет хотя-бы 1 единица, то возвращаем NAN
+		fot := math.NaN()
+		//fmt.Println(fot)
+		return fot
 
-	for i := len(bin_c) - 1; i >= 0; i-- {
-		if bin_c[i] == '1' {
-			E3 += s3
-		}
-		s3 *= 2
-	}
-	//fmt.Println(E3)
-
-	return
-}
-
-func M() (M1 int64, M2 int64, M3 int64) {
-
-	i, j, k := f1()
-	bin_a := i[9:]
-	bin_b := j[9:]
-	bin_c := k[9:]
-	/*
-		fmt.Println(len(bin_a))
-		fmt.Println(len(bin_b))
-		fmt.Println(len(bin_c))
-
-		fmt.Println(bin_a)
-		fmt.Println(bin_b)
-		fmt.Println(bin_c)
-	*/
-	var s1, s2, s3 int64 = 1, 1, 1
-
-	for i := len(bin_a) - 1; i >= 0; i-- {
-		if bin_a[i] == '1' {
-			M1 += s1
-		}
-		s1 *= 2
-	}
-	//fmt.Println(M1)
-
-	for i := len(bin_b) - 1; i >= 0; i-- {
-		if bin_b[i] == '1' {
-			M2 += s2
-		}
-		s2 *= 2
-	}
-	//fmt.Println(M2)
-
-	for i := len(bin_c) - 1; i >= 0; i-- {
-		if bin_c[i] == '1' {
-			M3 += s3
-		}
-		s3 *= 2
-	}
-	//fmt.Println(M3)
-
-	return
-
-}
-
-func Schet() {
-	i, j, k := E()
-
-	e1 := float64(i)
-	e2 := float64(j)
-	e3 := float64(k)
-
-	x, y, z := M()
-
-	m1 := float64(x)
-	m2 := float64(y)
-	m3 := float64(z)
-
-	var U1 float64 = math.Pow(-1, 0) * math.Pow(2, (e1-127)) * (1 + (m1 / math.Pow(2, 23)))
-	//fmt.Println(U1)
-
-	var U2 float64 = math.Pow(-1, 0) * math.Pow(2, (e2-127)) * (1 + (m2 / math.Pow(2, 23)))
-	//fmt.Println(U2)
-
-	var U3 float64 = math.Pow(-1, 0) * math.Pow(2, (e3-127)) * (1 + (m3 / math.Pow(2, 23)))
-	//fmt.Println(U3)
-
-	if (U1 + U2) == U3 {
-		fmt.Println("U1 + U2 =", U1+U2, "=", U3, "\n Гыыыы")
 	} else {
-		fmt.Println("U1 + U2 =", U1+U2, "!=", U3, "\n Ну нет так нет")
+		for i := len(bin_x) - 1; i >= 0; i-- {
+			if bin_x[i] == '1' {
+				E_x += s
+			}
+			s *= 2
+		}
+		//fmt.Println(E_x)
+
+		fot := math.Pow(2, E_x-1023-52)
+		//fmt.Println(fot)
+		return fot
+
+		//Sravnebie := new(big.Rat).SetFloat64((y - x) / fot)
+		//fmt.Println(Sravnebie)
+	}
+	//сделать ulp для бесконечности, для всех нулей(sub_normal)
+}
+
+func Rounding() {
+
+	var f float64 = 1.00000005960464488641292746251565404236316680908203125
+	var f1 float32 = 1.00000005960464488641292746251565404236316680908203125
+	var f2 float32 = float32(f)
+	fmt.Println(f1, f2)
+	var x2 string
+	var x1 uint64 = math.Float64bits(x)
+	fmt.Println(x1)
+	x2 = fmt.Sprintf("%032b", x1)
+	fmt.Println(x2)
+}
+
+func Float_ex() {
+
+	a1 := new(big.Float)
+	b1 := new(big.Float)
+	c1 := new(big.Float)
+	st1 := fmt.Sprintf("%.27f\n", float64(a))
+	st2 := fmt.Sprintf("%.26f\n", float64(b))
+	st3 := fmt.Sprintf("%.24f\n", float64(c))
+
+	_, err1 := fmt.Sscan(st1, a1)
+	if err1 != nil {
+		fmt.Println("Sscan: error_a1")
+		return
+	}
+
+	_, err2 := fmt.Sscan(st2, b1)
+	if err2 != nil {
+		fmt.Println("Sscan: error_a2")
+		return
+	}
+
+	_, err3 := fmt.Sscan(st3, c1)
+	if err3 != nil {
+		fmt.Println("Sscan: error_a3")
+		return
+	}
+
+	sum := new(big.Float)
+	sum.Add(a1, b1)
+	fmt.Println(a1, "+", b1, "=", sum)
+	if sum == c1 {
+		fmt.Println(sum, "==", c1)
+	} else {
+		fmt.Println(sum, "!=", c1)
 	}
 
 }
 
-func main() {
+func Rat_ex() {
 
-	E()
-	M()
-	Schet()
-	// 3 функции
-	// 1 переводит число в бинорный вид
-	// 2 описание числа в виде символов S E M
-	// 3 посчитать пример в фотке
+	a1 := new(big.Rat)
+	b1 := new(big.Rat)
+	c1 := new(big.Rat)
+
+	st1 := fmt.Sprintf("%.27f\n", float64(a))
+	st2 := fmt.Sprintf("%.26f\n", float64(b))
+	st3 := fmt.Sprintf("%.24f\n", float64(c))
+
+	_, err1 := fmt.Sscan(st1, a1)
+	if err1 != nil {
+		fmt.Println("Sscan: error_a1")
+		return
+	}
+
+	_, err2 := fmt.Sscan(st2, b1)
+	if err2 != nil {
+		fmt.Println("Sscan: error_a2")
+		return
+	}
+
+	_, err3 := fmt.Sscan(st3, c1)
+	if err3 != nil {
+		fmt.Println("Sscan: error_a3")
+		return
+	}
+
+	var sum = &big.Rat{}
+	sum.Add(a1, b1)
+	fmt.Println(a1, "+", b1, "=", sum)
+	if sum == c1 {
+		fmt.Println(sum, "==", c1)
+	} else {
+		fmt.Println(sum, "!=", c1)
+	}
+
 }
