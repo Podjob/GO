@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strings"
-
 	//"runtime/debug"
 	"math"
 	"math/big"
@@ -21,24 +20,41 @@ func main() {
 	pog()
 
 }
-func dif() float64{
-    var d float64 = 0
-    for i:= 1000000.00; i>=1; i--{
-        d+=1/i
-    }
-    return d
+
+func tuchka() (big.Rat){
+	var X_ici [31]big.Rat
+	var x0 big.Rat = 4
+	var x1 big.Rat = 4.25
+	X_ici[0] = x0
+	X_ici[1] = x1
+	var f big.Rat
+	y := x0
+	z := x1
+	for i:=0; i<30; i++{
+	    f:= 
+	    X_ici[i+2]:=f
+	}
+	return X_ici
 }
-func fid() float64{
-    var d float64 = 0
-    for i:=1.00; i<1000000; i++ {
-        d+=1/i
-    }
-    return d
+func dif() float64 {
+	var d float64 = 0
+	for i := 1000000.00; i >= 1; i-- {
+		d += 1 / i
+	}
+	return d
+}
+func fid() float64 {
+	var d float64 = 0
+	for i := 1.00; i < 1000000; i++ {
+		d += 1 / i
+	}
+	return d
 }
 
-func pog(){
-    fmt.Println((ulp()/2*1000000)/(1 - ulp()/2*1000000))
+func pog() {
+	fmt.Println((ulp() / 2 * 1000000) / (1 - ulp()/2*1000000))
 }
+
 // надо написать что-то окр(а+б) = (а+б)(1+f)// где |f|<=u // u= ulp/2
 var a float32 = 0.1
 var b float32 = 0.2
@@ -51,42 +67,26 @@ func ulp() (fot float64) {
 
 	var x2 string
 	var x1 uint64 = math.Float64bits(x)
-	//fmt.Println(x1)
 	x2 = fmt.Sprintf("%064b", x1)
-	//fmt.Println(x2)
 
 	bin_x := x2[1:12]
 
 	var E_x float64 = 0
 	var s float64 = 1
 
-	//f := math.Inf(1)
-	//fmt.Println(f)
-
-	//fmt.Println(bin_x)
-
-	//strings.Contains("something", "some")
-
 	if bin_x == "00000000000" {
 		var fot float64
 		ULP := math.Pow(2, -1074)
-		//fmt.Println(ULP)
 		fot = ULP
 		return fot
 
 	} else if bin_x == "11111111111" && !strings.Contains(x2[12:], "1") {
 		//1. если после 11 единиц идет 52 нуля, то возвращаяем бескончность
-		//fmt.Println("бесконечность")
-		//var fot float64
-		//f := math.Inf(1)
-		//fmt.Println(f)
-		//fot := f
 		return math.Inf(1)
 
 	} else if bin_x == "11111111111" && strings.Contains(x2[12:], "1") {
 		//2. если после 11 единиц идет хотя-бы 1 единица, то возвращаем NAN
 		fot := math.NaN()
-		//fmt.Println(fot)
 		return fot
 
 	} else {
@@ -96,16 +96,12 @@ func ulp() (fot float64) {
 			}
 			s *= 2
 		}
-		//fmt.Println(E_x)
-
 		fot := math.Pow(2, E_x-1023-52)
-		//fmt.Println(fot)
 		return fot
 
 		//Sravnebie := new(big.Rat).SetFloat64((y - x) / fot)
 		//fmt.Println(Sravnebie)
 	}
-	//сделать ulp для бесконечности, для всех нулей(sub_normal)
 }
 
 func Rounding() {
