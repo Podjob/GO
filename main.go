@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	//"strings"
 	//"runtime/debug"
 	"math"
-	"math/big"
+	//"math/big"
+	"math/rand"
 )
 
 func main() {
@@ -15,23 +16,43 @@ func main() {
 	// Rat_ex()
 	//fmt.Println(ulp())
 	//ulp()
-	fmt.Println(fid())
-	fmt.Println(dif())
-	pog()
+//	fmt.Println(fid())
+//	fmt.Println(dif())
+//	pog()
+	mass_bee()
 
 }
-
-func tuchka() (big.Rat){
+//Float64frombits(b uint64 ) float64
+func mass_bee(){
+  a := math.Float64frombits(rand.Uint64())
+  for a != a+1.0{
+    a = math.Float64frombits(rand.Uint64())
+  }
+  massiv := [4]float64{ 1, a, 2.0*a, -3.0*a}
+  sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3])
+  sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])
+  var sum3 float64
+  for i:=0; i<3;i++{
+    sum3:=massiv[i]
+  }
+  fmt.Println(massiv)
+  fmt.Println(sum1)
+  fmt.Println(sum2)
+  
+}
+//дома посмотреть 
+/*func tuchka() (big.Rat){
 	var X_ici [31]big.Rat
-	var x0 big.Rat = 4
-	var x1 big.Rat = 4.25
+	x0 := new(Rat).SetFloat64(4)
+	x1 := new(Rat).SetFloat64(4.25)
+	//fis := x1 := new(Rat).SetFloat64(108)
+	//sec := x1 := new(Rat).SetFloat64(4234)
+	
 	X_ici[0] = x0
 	X_ici[1] = x1
 	var f big.Rat
-	y := x0
-	z := x1
 	for i:=0; i<30; i++{
-	    f:= 
+	   // f:= 
 	    X_ici[i+2]:=f
 	}
 	return X_ici
@@ -192,4 +213,4 @@ func Rat_ex() {
 		fmt.Println(sum, "!=", c1)
 	}
 
-}
+}*/
