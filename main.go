@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	//"strings"
+	"strings"
+
 	//"runtime/debug"
 	"math"
 	"math/big"
@@ -16,84 +17,108 @@ func main() {
 	// Float_ex()
 	// Rat_ex()
 	//fmt.Println(ulp())
-	//ulp()
-//	fmt.Println(fid())
-//	fmt.Println(dif())
-//	pog()
+	//fmt.Println(ulp(1.0))
+	//	fmt.Println(fid())
+	//	fmt.Println(dif())
+	//	pog()
 	mass_bee()
 
 }
-//Float64frombits(b uint64 ) float64
-func mass_bee(){
-  a := math.Float64frombits(rand.Uint64())
-  for a != a+1.0{
-    a = math.Float64frombits(rand.Uint64())
-  }
-  
-  
-/*  var x1 uint64 = math.Float64bits(a)
-	x2:= fmt.Sprintf("%064b", x1)
-	fmt.Println(x2)
-  fmt.Println(a)*/
-  massiv := []float64{ 1.0, a, 2.0*a, -3.0*a}
-  m1 := new(big.Rat).SetFloat64(massiv[0])
-  m2 := new(big.Rat).SetFloat64(massiv[1])
-  m3 := new(big.Rat).SetFloat64(massiv[2])
-  m4 := new(big.Rat).SetFloat64(massiv[3])
-  sum := new(big.Rat).SetFloat64(0)
-  
-  sum.Add(sum, m1)
-  sum.Add(sum, m2)
-  sum.Add(sum, m3)
-  sum.Add(sum, m4)
-  fmt.Println(sum.RatString())
-  sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3])//3
-  sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])//2
-  var sum3 float64
-  //
-  sort.SliceStable(massiv, func(i, j int) bool {
-	    return math.Abs(massiv[i])< math.Abs(massiv[j])})
-  fmt.Println(massiv)
-  sum3 = massiv[3] + massiv[2]
-  massiv = massiv[:len(massiv)-2] 
-  massiv = append(massiv, sum3)
-  sort.SliceStable(massiv, func(i, j int) bool {
-	    return math.Abs(massiv[i])< math.Abs(massiv[j])})
+
+// Float64frombits(b uint64 ) float64
+func mass_bee() {
+	a := math.Float64frombits(rand.Uint64())
+	for a != a+1.0 {
+		a = math.Float64frombits(rand.Uint64())
+	}
+
+	/*  var x1 uint64 = math.Float64bits(a)
+		x2:= fmt.Sprintf("%064b", x1)
+		fmt.Println(x2)
+	  fmt.Println(a)*/
+	massiv := []float64{1.0, a, 2.0 * a, -3.0 * a}
+	massiv1 := massiv
+	m1 := new(big.Rat).SetFloat64(massiv[0])
+	m2 := new(big.Rat).SetFloat64(massiv[1])
+	m3 := new(big.Rat).SetFloat64(massiv[2])
+	m4 := new(big.Rat).SetFloat64(massiv[3])
+	sum := new(big.Rat).SetFloat64(0)
+
+	sum.Add(sum, m1)
+	sum.Add(sum, m2)
+	sum.Add(sum, m3)
+	sum.Add(sum, m4)
+	fmt.Println(sum.RatString())
+	sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3]) //3
+	sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])   //2
+	var sum3 float64
+	//
+	sort.SliceStable(massiv, func(i, j int) bool {
+		return math.Abs(massiv[i]) < math.Abs(massiv[j])
+	})
+	fmt.Println(massiv)
+	sum3 = massiv[3] + massiv[2]
+	massiv = massiv[:len(massiv)-2]
+	massiv = append(massiv, sum3)
+	sort.SliceStable(massiv, func(i, j int) bool {
+		return math.Abs(massiv[i]) < math.Abs(massiv[j])
+	})
 	fmt.Println(massiv)
 	sum3 = massiv[2] + massiv[1]
-  massiv = massiv[:len(massiv)-2] 
-  massiv = append(massiv, sum3)
-  sort.SliceStable(massiv, func(i, j int) bool {
-	    return math.Abs(massiv[i])< math.Abs(massiv[j])})
+	massiv = massiv[:len(massiv)-2]
+	massiv = append(massiv, sum3)
+	sort.SliceStable(massiv, func(i, j int) bool {
+		return math.Abs(massiv[i]) < math.Abs(massiv[j])
+	})
 	fmt.Println(massiv)
 	sum3 = massiv[1] + massiv[0]
-  massiv = massiv[:len(massiv)-2] 
-  massiv = append(massiv, sum3)
-  sort.SliceStable(massiv, func(i, j int) bool {
-	    return math.Abs(massiv[i])< math.Abs(massiv[j])})//3
+	massiv = massiv[:len(massiv)-2]
+	massiv = append(massiv, sum3)
+	sort.SliceStable(massiv, func(i, j int) bool {
+		return math.Abs(massiv[i]) < math.Abs(massiv[j])
+	}) //3
 	fmt.Println(massiv)
-  fmt.Println(sum1)
-  fmt.Println(sum2)
-  //Гn= n*y/(1-ny)//3 2 3
-  //y=1/2*ulp(1)
-  //summa(abs(massiv))* Гn
-  
- // fmt.Println(sum3)   
-  
+	fmt.Println(sum1)
+	fmt.Println(sum2)
+
+	y := ulp(1.0) / 2
+
+	Gn1 := (3.0 * y) / (1 - 3.0*y)
+	Gn3 := Gn1
+	Gn2 := (2.0 * y) / (1 - 2.0*y)
+
+	fmt.Println(Gn1)
+	fmt.Println(Gn2)
+	fmt.Println(Gn3)
+
+	fmt.Println("////////////////////////////////")
+	sumAsb1 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn1
+	fmt.Println(sumAsb1)
+	sumAsb2 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn2
+	fmt.Println(sumAsb2)
+	sumAsb3 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn3
+	fmt.Println(sumAsb3)
+	//Гn= n*y/(1-ny)//3 2 3
+	//y=1/2*ulp(1)
+	//summa(abs(massiv))* Гn
+
+	// fmt.Println(sum3)
+
 }
-//дома посмотреть 
+
+//дома посмотреть
 /*func tuchka() (big.Rat){
 	var X_ici [31]big.Rat
 	x0 := new(Rat).SetFloat64(4)
 	x1 := new(Rat).SetFloat64(4.25)
 	//fis := x1 := new(Rat).SetFloat64(108)
 	//sec := x1 := new(Rat).SetFloat64(4234)
-	
+
 	X_ici[0] = x0
 	X_ici[1] = x1
 	var f big.Rat
 	for i:=0; i<30; i++{
-	   // f:= 
+	   // f:=
 	    X_ici[i+2]:=f
 	}
 	return X_ici
@@ -121,7 +146,8 @@ var b float32 = 0.2
 var c float32 = 0.3
 var x float64 = 1.00
 var y float64 = 2.00
-func ulp() (fot float64) {
+*/
+func ulp(x float64) (fot float64) {
 	var x2 string
 	var x1 uint64 = math.Float64bits(x)
 	x2 = fmt.Sprintf("%064b", x1)
@@ -153,6 +179,8 @@ func ulp() (fot float64) {
 		//fmt.Println(Sravnebie)
 	}
 }
+
+/*
 func Rounding() {
 	var f float64 = 1.00000005960464488641292746251565404236316680908203125
 	var f1 float32 = 1.00000005960464488641292746251565404236316680908203125
