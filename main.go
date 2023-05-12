@@ -21,8 +21,22 @@ func main() {
 	//	fmt.Println(fid())
 	//	fmt.Println(dif())
 	//	pog()
-	mass_bee()
+	//	mass_bee()
+	vectochiki()
 
+}
+
+func vectochiki() {
+	vec1 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+	vec2 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+	fmt.Println(vec1)
+	fmt.Println(vec2)
+	var sum float64
+	for i := 0; i < len(vec1); i++ {
+		z := vec1[i] + vec2[i]
+		sum += z
+	}
+	fmt.Println(sum)
 }
 
 // Float64frombits(b uint64 ) float64
