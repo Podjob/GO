@@ -5,9 +5,13 @@ import (
 	"strings"
 
 	//"runtime/debug"
+
+	"encoding/binary"
+	"io"
 	"math"
 	"math/big"
 	"math/rand"
+	"os"
 	"sort"
 )
 
@@ -22,46 +26,47 @@ func main() {
 	//	fmt.Println(dif())
 	//	pog()
 	//	mass_bee()
-	vectochiki()
+	//vectochiki()
+	exem()
 
 }
 
-//нужно взять 2 вектора
-//вычисляем сколярное произвед с 2мя типами оценок: оприорной и бегущая
-// оприорна есть наже (это 3 суммы)
-// бегущая это модуль текущей суммы накопитель
+func exem() {
+	f, err := os.Open("368345.dat")
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	//var n int64
+	for {
+		var flt float64
+
+		err := binary.Read(f, binary.LittleEndian, &flt)
+
+		if err == io.EOF {
+			break
+		}
+		fmt.Println("float64:", flt)
+		//n++
+
+	}
+	//fmt.Println(n)
+
+}
 
 func vectochiki() {
-	var vec1 [1000]float64
-	var vec2 [1000]float64
-	var k int64 = 0
-	var j int64 = 0
-	var l int64 = 0
-	for i := 0; i < 1000; i++ {
-		vec1[i] = (rand.Float64() - 0.5) * 10000000
-		vec2[i] = math.Sqrt(2.0) * vec1[i]
-		if (vec2[i]*vec2[i] > 2*vec1[i]*vec1[i] && vec1[i] > 0) || (vec2[i]*vec2[i] < 2*vec1[i]*vec1[i] && vec1[i] < 0) {
-			k++
-			//fmt.Println("выше")
-		} else if (vec2[i]*vec2[i] < 2*vec1[i]*vec1[i] && vec1[i] > 0) || (vec2[i]*vec2[i] > 2*vec1[i]*vec1[i] && vec1[i] < 0) {
-			j++
-			//fmt.Println("ниже")
-		}
-		if ((vec2[i]-vec1[i])*(vec2[i]+vec1[i]) > vec1[i]*vec1[i]) && vec1[i]*vec1[i] > 0 {
-			l++
-		}
-	}
-	fmt.Println("выше", k)
-	fmt.Println("ниже", j)
-	fmt.Println("Ky", l)
-	//fmt.Println(vec1)
-
-	//var sum float64
-	/*for i := 0; i < len(vec1); i++ {
+	vec1 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+	vec2 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+	fmt.Println(vec1)
+	fmt.Println(vec2)
+	var sum float64
+	for i := 0; i < len(vec1); i++ {
 		z := vec1[i] + vec2[i]
 		sum += z
 	}
-	fmt.Println(sum)*/
+	fmt.Println(sum)
 }
 
 // Float64frombits(b uint64 ) float64
