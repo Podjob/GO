@@ -25,34 +25,106 @@ func main() {
 	//	fmt.Println(fid())
 	//	fmt.Println(dif())
 	//	pog()
-	//	mass_bee()
+	//mass_bee()
 	//vectochiki()
 	exem()
 
 }
+
+//нужно взять 2 вектора
+//вычисляем сколярное произвед с 2мя типами оценок: априорной и бегущая
+// априорна есть наже (это 3 суммы)
+// бегущая это модуль текущей суммы накопитель
 
 func exem() {
 	f, err := os.Open("368345.dat")
 	if err != nil {
 		panic(err)
 	}
-
 	defer f.Close()
-
-	//var n int64
+	var n int64
+	var v0 []float64
 	for {
 		var flt float64
-
 		err := binary.Read(f, binary.LittleEndian, &flt)
-
 		if err == io.EOF {
 			break
 		}
-		fmt.Println("float64:", flt)
-		//n++
-
+		v0 = append(v0, flt)
+		n++
 	}
-	//fmt.Println(n)
+	var Fv1 []float64
+	var Fv2 []float64
+	var Rv1 []*big.Rat
+	var Rv2 []*big.Rat
+	if len(v0)%2 == 0 {
+		for i := 0; i < len(v0)/2; i++ {
+			Fv1 = append(Fv1, v0[i])
+			Fv2 = append(Fv2, v0[len(v0)/2+i])
+			////////////////////////////////////
+			Rv1 = append(Rv1, new(big.Rat).SetFloat64(v0[i]))
+			Rv2 = append(Rv2, new(big.Rat).SetFloat64(v0[len(v0)/2+i]))
+		}
+
+		////////////////////////////////////////////////////////////////
+
+		fmt.Println("                        1 способ сумм-ия")
+		var scalProdFl1 float64 = 0
+		var Gn1 int64 = 0
+		for i := 0; i < len(Fv1); i++ {
+			scalProdFl1 = scalProdFl1 + Fv1[i]*Fv2[i]
+			Gn1++
+		}
+		fmt.Println(scalProdFl1)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(Gn1)
+
+		////////////////////////////////////////////////////////////////
+
+		fmt.Println("                        2 способ сумм-ия")
+		var scalProdFl2 float64 = 0
+		var Gn2 int64 = 1
+		for i := 0; i < len(Fv1); i = i + 2 {
+			scalProdFl2 = scalProdFl2 + Fv1[i]*Fv2[i] + Fv1[i+1]*Fv2[i+1]
+			Gn2++
+		}
+		fmt.Println(scalProdFl2)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(Gn2)
+
+		////////////////////////////////////////////////////////////////
+
+		fmt.Println("                        3 способ сумм-ия")
+		var scalProdFl3 float64 = 0
+		var Gn3 int64 = 0
+		var masFv []float64
+		for i := 0; i < len(Fv1); i++ {
+			a := Fv1[i] * Fv2[i]
+			masFv = append(masFv, a)
+		}
+		sort.SliceStable(masFv, func(i, j int) bool {
+			return math.Abs(masFv[i]) < math.Abs(masFv[j])
+		})
+		for i := len(Fv1) - 1; i >= 0; i-- {
+			if i != 0 {
+				scalProdFl3 = masFv[i] + masFv[i-1]
+				masFv = masFv[:len(masFv)-2]
+				masFv = append(masFv, scalProdFl3)
+				sort.SliceStable(masFv, func(i, j int) bool {
+					return math.Abs(masFv[i]) < math.Abs(masFv[j])
+				})
+				Gn3++
+			} else if i == 0 {
+				scalProdFl3 = masFv[i]
+				Gn3++
+			}
+		}
+		fmt.Println(scalProdFl3)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(Gn3)
+	} else {
+		fmt.Print("В массиве нечетное число элементов")
+	}
 
 }
 
@@ -92,7 +164,7 @@ func mass_bee() {
 	sum.Add(sum, m2)
 	sum.Add(sum, m3)
 	sum.Add(sum, m4)
-	fmt.Println(sum.RatString())
+	//fmt.Println(sum.RatString())
 	sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3]) //3
 	sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])   //2
 	var sum3 float64
@@ -122,8 +194,13 @@ func mass_bee() {
 		return math.Abs(massiv[i]) < math.Abs(massiv[j])
 	}) //3
 	fmt.Println(massiv)
+	fmt.Println("??????????????????????????????????")
 	fmt.Println(sum1)
+	fmt.Println("??????????????????????????????????")
 	fmt.Println(sum2)
+	fmt.Println("??????????????????????????????????")
+	fmt.Println(sum3)
+	fmt.Println("??????????????????????????????????")
 
 	y := ulp(1.0) / 2
 
