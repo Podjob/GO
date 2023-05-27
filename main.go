@@ -9,13 +9,16 @@ import (
 	"encoding/binary"
 	"io"
 	"math"
-	"math/big"
-	"math/rand"
+
+	//"math/big"
+	//"math/rand"
 	"os"
 	"sort"
 )
 
 func main() {
+
+	exem()
 
 	//Rounding()
 	// Float_ex()
@@ -27,7 +30,6 @@ func main() {
 	//	pog()
 	//mass_bee()
 	//vectochiki()
-	exem()
 
 }
 
@@ -55,212 +57,243 @@ func exem() {
 	}
 	var Fv1 []float64
 	var Fv2 []float64
-	var Rv1 []*big.Rat
-	var Rv2 []*big.Rat
-	if len(v0)%2 == 0 {
-		for i := 0; i < len(v0)/2; i++ {
-			Fv1 = append(Fv1, v0[i])
-			Fv2 = append(Fv2, v0[len(v0)/2+i])
-			////////////////////////////////////
-			Rv1 = append(Rv1, new(big.Rat).SetFloat64(v0[i]))
-			Rv2 = append(Rv2, new(big.Rat).SetFloat64(v0[len(v0)/2+i]))
-		}
-
-		////////////////////////////////////////////////////////////////
-
-		fmt.Println("                        1 способ сумм-ия")
-		var scalProdFl1 float64 = 0
-		var Gn1 int64 = 0
-		for i := 0; i < len(Fv1); i++ {
-			scalProdFl1 = scalProdFl1 + Fv1[i]*Fv2[i]
-			Gn1++
-		}
-		fmt.Println(scalProdFl1)
-		fmt.Println("??????????????????????????????????")
-		fmt.Println(Gn1)
-
-		////////////////////////////////////////////////////////////////
-
-		fmt.Println("                        2 способ сумм-ия")
-		var scalProdFl2 float64 = 0
-		var Gn2 int64 = 1
-		for i := 0; i < len(Fv1); i = i + 2 {
-			scalProdFl2 = scalProdFl2 + Fv1[i]*Fv2[i] + Fv1[i+1]*Fv2[i+1]
-			Gn2++
-		}
-		fmt.Println(scalProdFl2)
-		fmt.Println("??????????????????????????????????")
-		fmt.Println(Gn2)
-
-		////////////////////////////////////////////////////////////////
-
-		fmt.Println("                        3 способ сумм-ия")
-		var scalProdFl3 float64 = 0
-		var Gn3 int64 = 0
-		var masFv []float64
-		for i := 0; i < len(Fv1); i++ {
-			a := Fv1[i] * Fv2[i]
-			masFv = append(masFv, a)
-		}
-		sort.SliceStable(masFv, func(i, j int) bool {
-			return math.Abs(masFv[i]) < math.Abs(masFv[j])
-		})
-		for i := len(Fv1) - 1; i >= 0; i-- {
-			if i != 0 {
-				scalProdFl3 = masFv[i] + masFv[i-1]
-				masFv = masFv[:len(masFv)-2]
-				masFv = append(masFv, scalProdFl3)
-				sort.SliceStable(masFv, func(i, j int) bool {
-					return math.Abs(masFv[i]) < math.Abs(masFv[j])
-				})
-				Gn3++
-			} else if i == 0 {
-				scalProdFl3 = masFv[i]
-				Gn3++
-			}
-		}
-		fmt.Println(scalProdFl3)
-		fmt.Println("??????????????????????????????????")
-		fmt.Println(Gn3)
+	if len(v0)%2 != 0 {
+		return
+	}
+	for i := 0; i < len(v0)/2; i++ {
+		Fv1 = append(Fv1, v0[i])
+		Fv2 = append(Fv2, v0[len(v0)/2+i])
+	}
+	////////////////////////////////////////////////////////////////
+	fmt.Println("                        1й способ сумм-ия")
+	var scalProdFl1 float64 = 0
+	var n1 int = len(Fv1) - 1
+	for i := 0; i < len(Fv1); i++ {
+		scalProdFl1 = scalProdFl1 + Fv1[i]*Fv2[i]
+	}
+	fmt.Println("Скаляр призвед 1:", scalProdFl1)
+	fmt.Println("Число операций:", n1)
+	////////////////////////////////////////////////////////////////
+	fmt.Println("                        2й способ сумм-ия")
+	var scalProdFl2 float64 = 0
+	var n2 int
+	if len(Fv1) == 2 {
+		n2 = 1
+	} else if len(Fv1) == 1 {
+		n2 = 0
 	} else {
-		fmt.Print("В массиве нечетное число элементов")
+		n2 = len(Fv1)/2 + 1
 	}
-
-}
-
-func vectochiki() {
-	vec1 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
-	vec2 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
-	fmt.Println(vec1)
-	fmt.Println(vec2)
-	var sum float64
-	for i := 0; i < len(vec1); i++ {
-		z := vec1[i] + vec2[i]
-		sum += z
+	if len(Fv1)%2 == 0 {
+		for i := 0; i < len(Fv1); i = i + 2 {
+			scalProdFl2 = scalProdFl2 + (Fv1[i]*Fv2[i] + Fv1[i+1]*Fv2[i+1])
+		}
+	} else {
+		Fv1_copy := Fv1
+		Fv1_copy = append(Fv1_copy, 0)
+		Fv2_copy := Fv2
+		Fv2_copy = append(Fv2_copy, 0)
+		for i := 0; i < len(Fv1_copy); i = i + 2 {
+			scalProdFl2 = scalProdFl2 + (Fv1_copy[i]*Fv2_copy[i] + Fv1_copy[i+1]*Fv2_copy[i+1])
+		}
 	}
-	fmt.Println(sum)
-}
-
-// Float64frombits(b uint64 ) float64
-func mass_bee() {
-	a := math.Float64frombits(rand.Uint64())
-	for a != a+1.0 {
-		a = math.Float64frombits(rand.Uint64())
+	fmt.Println("Скаляр призвед 2:", scalProdFl2)
+	fmt.Println("Число операций:", n2)
+	////////////////////////////////////////////////////////////////
+	fmt.Println("                        3й способ сумм-ия")
+	var scalProdFl3 float64 = 0
+	var n3 int = len(Fv1) - 1
+	var masFv []float64
+	for i := 0; i < len(Fv1); i++ {
+		a := Fv1[i] * Fv2[i]
+		masFv = append(masFv, a)
 	}
-
-	/*  var x1 uint64 = math.Float64bits(a)
-		x2:= fmt.Sprintf("%064b", x1)
-		fmt.Println(x2)
-	  fmt.Println(a)*/
-	massiv := []float64{1.0, a, 2.0 * a, -3.0 * a}
-	massiv1 := massiv
-	m1 := new(big.Rat).SetFloat64(massiv[0])
-	m2 := new(big.Rat).SetFloat64(massiv[1])
-	m3 := new(big.Rat).SetFloat64(massiv[2])
-	m4 := new(big.Rat).SetFloat64(massiv[3])
-	sum := new(big.Rat).SetFloat64(0)
-
-	sum.Add(sum, m1)
-	sum.Add(sum, m2)
-	sum.Add(sum, m3)
-	sum.Add(sum, m4)
-	//fmt.Println(sum.RatString())
-	sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3]) //3
-	sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])   //2
-	var sum3 float64
-	//
-	sort.SliceStable(massiv, func(i, j int) bool {
-		return math.Abs(massiv[i]) < math.Abs(massiv[j])
+	sort.SliceStable(masFv, func(i, j int) bool {
+		return math.Abs(masFv[i]) < math.Abs(masFv[j])
 	})
-	fmt.Println(massiv)
-	sum3 = massiv[3] + massiv[2]
-	massiv = massiv[:len(massiv)-2]
-	massiv = append(massiv, sum3)
-	sort.SliceStable(massiv, func(i, j int) bool {
-		return math.Abs(massiv[i]) < math.Abs(massiv[j])
-	})
-	fmt.Println(massiv)
-	sum3 = massiv[2] + massiv[1]
-	massiv = massiv[:len(massiv)-2]
-	massiv = append(massiv, sum3)
-	sort.SliceStable(massiv, func(i, j int) bool {
-		return math.Abs(massiv[i]) < math.Abs(massiv[j])
-	})
-	fmt.Println(massiv)
-	sum3 = massiv[1] + massiv[0]
-	massiv = massiv[:len(massiv)-2]
-	massiv = append(massiv, sum3)
-	sort.SliceStable(massiv, func(i, j int) bool {
-		return math.Abs(massiv[i]) < math.Abs(massiv[j])
-	}) //3
-	fmt.Println(massiv)
-	fmt.Println("??????????????????????????????????")
-	fmt.Println(sum1)
-	fmt.Println("??????????????????????????????????")
-	fmt.Println(sum2)
-	fmt.Println("??????????????????????????????????")
-	fmt.Println(sum3)
-	fmt.Println("??????????????????????????????????")
+	for i := len(Fv1) - 1; i >= 0; i-- {
+		if i != 0 {
+			scalProdFl3 = masFv[i] + masFv[i-1]
+			masFv = masFv[:len(masFv)-2]
+			masFv = append(masFv, scalProdFl3)
+			sort.SliceStable(masFv, func(i, j int) bool {
+				return math.Abs(masFv[i]) < math.Abs(masFv[j])
+			})
+		} else if i == 0 {
+			scalProdFl3 = masFv[i]
+		}
+	}
+	fmt.Println("Скаляр призвед 3:", scalProdFl3)
+	fmt.Println("Число операций:", n3)
 
 	y := ulp(1.0) / 2
+	var N1 float64 = float64(n1)
+	var N2 float64 = float64(n2)
+	var N3 float64 = float64(n3)
+	Gn1 := (N1 * y) / (1 - N1*y)
+	Gn2 := (N2 * y) / (1 - N2*y)
+	Gn3 := (N3 * y) / (1 - N3*y)
 
-	Gn1 := (3.0 * y) / (1 - 3.0*y)
-	Gn3 := Gn1
-	Gn2 := (2.0 * y) / (1 - 2.0*y)
+	var sumAbs1 float64 = 0.0
+	var sumAbs2 float64 = 0.0
+	var sumAbs3 float64 = 0.0
+	for i := 1; i < len(Fv1); i++ {
+		sumAbs1 = sumAbs1 + math.Abs(Fv1[i]*Fv2[i])
+		sumAbs2 = sumAbs2 + math.Abs(Fv1[i]*Fv2[i])
+		sumAbs3 = sumAbs3 + math.Abs(Fv1[i]*Fv2[i])
+	}
+	sumAbs1 = sumAbs1 * Gn1
+	sumAbs2 = sumAbs2 * Gn2
+	sumAbs3 = sumAbs3 * Gn3
 
-	fmt.Println(Gn1)
-	fmt.Println(Gn2)
-	fmt.Println(Gn3)
+	fmt.Println(sumAbs1)
+	fmt.Println(sumAbs2)
+	fmt.Println(sumAbs3)
 
-	fmt.Println("////////////////////////////////")
-	sumAsb1 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn1
-	fmt.Println(sumAsb1)
-	sumAsb2 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn2
-	fmt.Println(sumAsb2)
-	sumAsb3 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn3
-	fmt.Println(sumAsb3)
-	//Гn= n*y/(1-ny)//3 2 3
-	//y=1/2*ulp(1)
-	//summa(abs(massiv))* Гn
+	fmt.Println()
+	fmt.Println()
+}
 
-	// fmt.Println(sum3)
+/*
+	func vectochiki() {
+		vec1 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+		vec2 := []float64{math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64()), math.Float64frombits(rand.Uint64())}
+		fmt.Println(vec1)
+		fmt.Println(vec2)
+		var sum float64
+		for i := 0; i < len(vec1); i++ {
+			z := vec1[i] + vec2[i]
+			sum += z
+		}
+		fmt.Println(sum)
+	}
+
+// Float64frombits(b uint64 ) float64
+
+	func mass_bee() {
+		a := math.Float64frombits(rand.Uint64())
+		for a != a+1.0 {
+			a = math.Float64frombits(rand.Uint64())
+		}
+
+		/*  var x1 uint64 = math.Float64bits(a)
+			x2:= fmt.Sprintf("%064b", x1)
+			fmt.Println(x2)
+		  fmt.Println(a)
+		massiv := []float64{1.0, a, 2.0 * a, -3.0 * a}
+		massiv1 := massiv
+		m1 := new(big.Rat).SetFloat64(massiv[0])
+		m2 := new(big.Rat).SetFloat64(massiv[1])
+		m3 := new(big.Rat).SetFloat64(massiv[2])
+		m4 := new(big.Rat).SetFloat64(massiv[3])
+		sum := new(big.Rat).SetFloat64(0)
+
+		sum.Add(sum, m1)
+		sum.Add(sum, m2)
+		sum.Add(sum, m3)
+		sum.Add(sum, m4)
+		//fmt.Println(sum.RatString())
+		sum1 := (((massiv[0] + massiv[1]) + massiv[2]) + massiv[3]) //3
+		sum2 := (massiv[0] + massiv[1]) + (massiv[2] + massiv[3])   //2
+		var sum3 float64
+		//
+		sort.SliceStable(massiv, func(i, j int) bool {
+			return math.Abs(massiv[i]) < math.Abs(massiv[j])
+		})
+		fmt.Println(massiv)
+		sum3 = massiv[3] + massiv[2]
+		massiv = massiv[:len(massiv)-2]
+		massiv = append(massiv, sum3)
+		sort.SliceStable(massiv, func(i, j int) bool {
+			return math.Abs(massiv[i]) < math.Abs(massiv[j])
+		})
+		fmt.Println(massiv)
+		sum3 = massiv[2] + massiv[1]
+		massiv = massiv[:len(massiv)-2]
+		massiv = append(massiv, sum3)
+		sort.SliceStable(massiv, func(i, j int) bool {
+			return math.Abs(massiv[i]) < math.Abs(massiv[j])
+		})
+		fmt.Println(massiv)
+		sum3 = massiv[1] + massiv[0]
+		massiv = massiv[:len(massiv)-2]
+		massiv = append(massiv, sum3)
+		sort.SliceStable(massiv, func(i, j int) bool {
+			return math.Abs(massiv[i]) < math.Abs(massiv[j])
+		}) //3
+		fmt.Println(massiv)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(sum1)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(sum2)
+		fmt.Println("??????????????????????????????????")
+		fmt.Println(sum3)
+		fmt.Println("??????????????????????????????????")
+
+		y := ulp(1.0) / 2
+
+		Gn1 := (3.0 * y) / (1 - 3.0*y)
+		Gn3 := Gn1
+		Gn2 := (2.0 * y) / (1 - 2.0*y)
+
+		fmt.Println(Gn1)
+		fmt.Println(Gn2)
+		fmt.Println(Gn3)
+
+		fmt.Println("////////////////////////////////")
+		sumAsb1 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn1
+		fmt.Println(sumAsb1)
+		sumAsb2 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn2
+		fmt.Println(sumAsb2)
+		sumAsb3 := (math.Abs(massiv1[0]) + math.Abs(massiv1[1]) + math.Abs(massiv1[2]) + math.Abs(massiv1[3])) * Gn3
+		fmt.Println(sumAsb3)
+		//Гn= n*y/(1-ny)//3 2 3
+		//y=1/2*ulp(1)
+		//summa(abs(massiv))* Гn
+
+		// fmt.Println(sum3)
 
 }
 
 //дома посмотреть
-/*func tuchka() (big.Rat){
-	var X_ici [31]big.Rat
-	x0 := new(Rat).SetFloat64(4)
-	x1 := new(Rat).SetFloat64(4.25)
-	//fis := x1 := new(Rat).SetFloat64(108)
-	//sec := x1 := new(Rat).SetFloat64(4234)
 
-	X_ici[0] = x0
-	X_ici[1] = x1
-	var f big.Rat
-	for i:=0; i<30; i++{
-	   // f:=
-	    X_ici[i+2]:=f
+	/*func tuchka() (big.Rat){
+		var X_ici [31]big.Rat
+		x0 := new(Rat).SetFloat64(4)
+		x1 := new(Rat).SetFloat64(4.25)
+		//fis := x1 := new(Rat).SetFloat64(108)
+		//sec := x1 := new(Rat).SetFloat64(4234)
+
+		X_ici[0] = x0
+		X_ici[1] = x1
+		var f big.Rat
+		for i:=0; i<30; i++{
+		   // f:=
+		    X_ici[i+2]:=f
+		}
+		return X_ici
 	}
-	return X_ici
-}
-func dif() float64 {
-	var d float64 = 0
-	for i := 1000000.00; i >= 1; i-- {
-		d += 1 / i
+
+	func dif() float64 {
+		var d float64 = 0
+		for i := 1000000.00; i >= 1; i-- {
+			d += 1 / i
+		}
+		return d
 	}
-	return d
-}
-func fid() float64 {
-	var d float64 = 0
-	for i := 1.00; i < 1000000; i++ {
-		d += 1 / i
+
+	func fid() float64 {
+		var d float64 = 0
+		for i := 1.00; i < 1000000; i++ {
+			d += 1 / i
+		}
+		return d
 	}
-	return d
-}
-func pog() {
-	fmt.Println((ulp() / 2 * 1000000) / (1 - ulp()/2*1000000))
-}
+
+	func pog() {
+		fmt.Println((ulp() / 2 * 1000000) / (1 - ulp()/2*1000000))
+	}
+
 // надо написать что-то окр(а+б) = (а+б)(1+f)// где |f|<=u // u= ulp/2
 var a float32 = 0.1
 var b float32 = 0.2
