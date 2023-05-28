@@ -18,7 +18,7 @@ import (
 
 func main() {
 
-	exem()
+	scalarProduct()
 
 	//Rounding()
 	// Float_ex()
@@ -33,19 +33,14 @@ func main() {
 
 }
 
-//нужно взять 2 вектора
-//вычисляем сколярное произвед с 2мя типами оценок: априорной и бегущая
-// априорна есть наже (это 3 суммы)
-// бегущая это модуль текущей суммы накопитель
-
-func exem() {
+func scalarProduct() {
 	f, err := os.Open("368345.dat")
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-	var n int64
-	var v0 []float64
+	var v0 []float64 // массив из файла
+	var n int64      // число элементов в v0
 	for {
 		var flt float64
 		err := binary.Read(f, binary.LittleEndian, &flt)
@@ -55,8 +50,9 @@ func exem() {
 		v0 = append(v0, flt)
 		n++
 	}
-	var Fv1 []float64
-	var Fv2 []float64
+	var Fv1 []float64 // первый вектор
+	var Fv2 []float64 // второй вектор
+	// проверка числа элем. массива на четность на четность
 	if len(v0)%2 != 0 {
 		return
 	}
@@ -65,8 +61,8 @@ func exem() {
 		Fv2 = append(Fv2, v0[len(v0)/2+i])
 	}
 	////////////////////////////////////////////////////////////////
-	fmt.Println("                        1й способ сумм-ия")
-	var scalProdFl1 float64 = 0
+	fmt.Println("                        1й способ сумм-ия") //(((massiv[0] + massiv[1]) + massiv[2]) + massiv[3])
+	var scalProdFl1 float64 = 0                              // 1ое скал произв
 	var n1 int = len(Fv1) - 1
 	for i := 0; i < len(Fv1); i++ {
 		scalProdFl1 = scalProdFl1 + Fv1[i]*Fv2[i]
@@ -74,9 +70,10 @@ func exem() {
 	fmt.Println("Скаляр призвед 1:", scalProdFl1)
 	fmt.Println("Число операций:", n1)
 	////////////////////////////////////////////////////////////////
-	fmt.Println("                        2й способ сумм-ия")
-	var scalProdFl2 float64 = 0
+	fmt.Println("                        2й способ сумм-ия") //(massiv[0] + massiv[1]) + (massiv[2] + massiv[3])
+	var scalProdFl2 float64 = 0                              // 2ое скал произв
 	var n2 int
+	// проверка числа опреаций для 2ого сопособа
 	if len(Fv1) == 2 {
 		n2 = 1
 	} else if len(Fv1) == 1 {
@@ -84,15 +81,16 @@ func exem() {
 	} else {
 		n2 = len(Fv1)/2 + 1
 	}
+	// проверка на четность числа элементов массива
 	if len(Fv1)%2 == 0 {
 		for i := 0; i < len(Fv1); i = i + 2 {
 			scalProdFl2 = scalProdFl2 + (Fv1[i]*Fv2[i] + Fv1[i+1]*Fv2[i+1])
 		}
 	} else {
-		Fv1_copy := Fv1
-		Fv1_copy = append(Fv1_copy, 0)
-		Fv2_copy := Fv2
-		Fv2_copy = append(Fv2_copy, 0)
+		Fv1_copy := Fv1                // копия массива Fv1
+		Fv1_copy = append(Fv1_copy, 0) // добавляем в конец массива четный элемент, равный нулю
+		Fv2_copy := Fv2                // копия массива Fv2
+		Fv2_copy = append(Fv2_copy, 0) // добавляем в конец массива четный элемент, равный нулю
 		for i := 0; i < len(Fv1_copy); i = i + 2 {
 			scalProdFl2 = scalProdFl2 + (Fv1_copy[i]*Fv2_copy[i] + Fv1_copy[i+1]*Fv2_copy[i+1])
 		}
@@ -100,22 +98,23 @@ func exem() {
 	fmt.Println("Скаляр призвед 2:", scalProdFl2)
 	fmt.Println("Число операций:", n2)
 	////////////////////////////////////////////////////////////////
-	fmt.Println("                        3й способ сумм-ия")
-	var scalProdFl3 float64 = 0
+	fmt.Println("                        3й способ сумм-ия") // сложение 2х последних элементов массива и удаление элементов
+	var scalProdFl3 float64 = 0                              // 3е скал произв
 	var n3 int = len(Fv1) - 1
 	var masFv []float64
 	for i := 0; i < len(Fv1); i++ {
 		a := Fv1[i] * Fv2[i]
 		masFv = append(masFv, a)
 	}
+	// функиция для сортировки массива (элементы берутся по модулю)
 	sort.SliceStable(masFv, func(i, j int) bool {
 		return math.Abs(masFv[i]) < math.Abs(masFv[j])
 	})
 	for i := len(Fv1) - 1; i >= 0; i-- {
 		if i != 0 {
 			scalProdFl3 = masFv[i] + masFv[i-1]
-			masFv = masFv[:len(masFv)-2]
-			masFv = append(masFv, scalProdFl3)
+			masFv = masFv[:len(masFv)-2]       // удаляем последние 2 элеметна массива
+			masFv = append(masFv, scalProdFl3) // добавляем в конец сумму 2х удаленных элементов
 			sort.SliceStable(masFv, func(i, j int) bool {
 				return math.Abs(masFv[i]) < math.Abs(masFv[j])
 			})
@@ -125,7 +124,7 @@ func exem() {
 	}
 	fmt.Println("Скаляр призвед 3:", scalProdFl3)
 	fmt.Println("Число операций:", n3)
-
+	////////////////////////////////////////////////////////////////
 	y := ulp(1.0) / 2
 	var N1 float64 = float64(n1)
 	var N2 float64 = float64(n2)
@@ -137,18 +136,25 @@ func exem() {
 	var sumAbs1 float64 = 0.0
 	var sumAbs2 float64 = 0.0
 	var sumAbs3 float64 = 0.0
+	var scalProdSum float64 = 0.0
+
 	for i := 1; i < len(Fv1); i++ {
-		sumAbs1 = sumAbs1 + math.Abs(Fv1[i]*Fv2[i])
-		sumAbs2 = sumAbs2 + math.Abs(Fv1[i]*Fv2[i])
-		sumAbs3 = sumAbs3 + math.Abs(Fv1[i]*Fv2[i])
+		sumAbs1 = sumAbs1 + Fv1[i]*Fv2[i]
+		sumAbs2 = sumAbs2 + Fv1[i]*Fv2[i]
+		sumAbs3 = sumAbs3 + Fv1[i]*Fv2[i]
+		scalProdSum = scalProdSum + math.Abs(sumAbs1) + math.Abs(Fv1[i]*Fv2[i])
 	}
 	sumAbs1 = sumAbs1 * Gn1
 	sumAbs2 = sumAbs2 * Gn2
 	sumAbs3 = sumAbs3 * Gn3
 
-	fmt.Println(sumAbs1)
-	fmt.Println(sumAbs2)
-	fmt.Println(sumAbs3)
+	fmt.Println()
+
+	if math.Abs(scalProdFl1-sumAbs1) < scalProdSum && math.Abs(scalProdFl2-sumAbs2) < scalProdSum && math.Abs(scalProdFl3-sumAbs3) < scalProdSum {
+		fmt.Println(math.Abs(scalProdFl1-sumAbs1), "<", scalProdSum)
+		fmt.Println(math.Abs(scalProdFl2-sumAbs2), "<", scalProdSum)
+		fmt.Println(math.Abs(scalProdFl3-sumAbs3), "<", scalProdSum)
+	}
 
 	fmt.Println()
 	fmt.Println()
@@ -408,3 +414,8 @@ func Rat_ex() {
 		fmt.Println(sum, "!=", c1)
 	}
 }*/
+
+//нужно взять 2 вектора
+//вычисляем сколярное произвед с 2мя типами оценок: априорной и бегущая
+// априорна есть наже (это 3 суммы)
+// бегущая это модуль текущей суммы накопитель
