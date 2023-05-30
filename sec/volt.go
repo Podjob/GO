@@ -1,73 +1,207 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
-	"strings"
-
-	//"runtime/debug"
+	"io"
 	"math"
-	"math/big"
+	"os"
+	"sort"
+	"strings"
 )
 
 func main() {
 
-	//Rounding()
-	// Float_ex()
-	// Rat_ex()
-	fmt.Println(ulp())
-	ulp()
+	scalarProduct()
 
 }
 
-var a float32 = 0.1
-var b float32 = 0.2
-var c float32 = 0.3
+func scalarProduct() {
+	f, err := os.Open("368345.dat")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	var v0 []float64 // массив из файла
+	var n int64      // число элементов в v0
+	for {
+		var flt float64
+		err := binary.Read(f, binary.LittleEndian, &flt)
+		if err == io.EOF {
+			break
+		}
+		v0 = append(v0, flt)
+		n++
+	}
+	var Fv1 []float64 // первый вектор
+	var Fv2 []float64 // второй вектор
+	// проверка числа элем. массива на четность на четность
+	if len(v0)%2 != 0 {
+		return
+	}
+	for i := 0; i < len(v0)/2; i++ {
+		Fv1 = append(Fv1, v0[i])
+		Fv2 = append(Fv2, v0[len(v0)/2+i])
+	}
+	//1________//////////////////////////////////////////////////////////////
+	fmt.Println("                        1й способ сумм-ия") //(((massiv[0] + massiv[1]) + massiv[2]) + massiv[3])
+	var scalProdFl1 float64 = 0                              // 1ое скал произв
+	var n1 int = len(Fv1)*len(Fv1) - 1
+	for i := 0; i < len(Fv1); i++ {
+		scalProdFl1 = scalProdFl1 + Fv1[i]*Fv2[i]
+	}
+	fmt.Println("Скаляр призвед 1:", scalProdFl1)
+	fmt.Println("Число операций:", n1)
+	//2________//////////////////////////////////////////////////////////////
+	fmt.Println("                        2й способ сумм-ия") //(massiv[0] + massiv[1]) + (massiv[2] + massiv[3])
+	var scalProdFl2 float64 = 0                              // 2ое скал произв
+	var n2 int
+	// проверка числа опреаций для 2ого сопособа
+	// log(n)?????????????
+	if len(Fv1) == 2 {
+		n2 = 1
+	} else if len(Fv1) == 1 {
+		n2 = 0
+	} else {
+		n2 = len(Fv1) - 1
+	}
+	// проверка на четность числа элементов массива
+	var ProdFv []float64
 
-var x float64 = math.Pow(2, -1074)
-var y float64 = 2.00
+	if len(Fv1)%2 == 0 {
+		for i := 0; i < len(Fv1); i++ {
+			ProdFv = append(ProdFv, Fv1[i]*Fv2[i])
+		}
+	} else {
+		Fv1_copy := Fv1                // копия массива Fv1
+		Fv1_copy = append(Fv1_copy, 0) // добавляем в конец массива четный элемент, равный нулю
+		Fv2_copy := Fv2                // копия массива Fv2
+		Fv2_copy = append(Fv2_copy, 0) // добавляем в конец массива четный элемент, равный нулю
+		for i := 0; i < len(Fv1_copy); i++ {
+			ProdFv = append(ProdFv, Fv1_copy[i]*Fv2_copy[i])
+		}
+	}
+	var vecZero []float64
+	for {
+		if len(ProdFv) != 1 {
+			vec := vecZero
+			for i := 0; i < len(ProdFv); i = i + 2 {
+				a := ProdFv[i] + ProdFv[i+1]
+				vec = append(vec, a)
+			}
+			ProdFv = vec
+		} else {
+			scalProdFl2 = ProdFv[0]
+			break
+		}
+		if len(ProdFv)%2 != 0 && len(ProdFv) != 1 {
+			ProdFv = append(ProdFv, 0)
+		}
+	}
 
-func ulp() (fot float64) {
+	fmt.Println("Скаляр призвед 2:", scalProdFl2)
+	fmt.Println("Число операций:", n2)
+	//3________//////////////////////////////////////////////////////////////
+	fmt.Println("                        3й способ сумм-ия") //суммирование вставками
+	var scalProdFl3 float64 = 0                              // 3е скал произв
+	var n3 int = len(Fv1) - 1
+	var masFv []float64
+	for i := 0; i < len(Fv1); i++ {
+		a := Fv1[i] * Fv2[i]
+		masFv = append(masFv, a)
+	}
+	// функиция для сортировки массива (элементы берутся по модулю)
+	sort.SliceStable(masFv, func(i, j int) bool {
+		return math.Abs(masFv[i]) < math.Abs(masFv[j])
+	})
+	for i := len(Fv1) - 1; i >= 0; i-- {
+		if i != 0 {
+			scalProdFl3 = masFv[i] + masFv[i-1]
+			masFv = masFv[:len(masFv)-2]       // удаляем последние 2 элеметна массива
+			masFv = append(masFv, scalProdFl3) // добавляем в конец сумму 2х удаленных элементов
+			sort.SliceStable(masFv, func(i, j int) bool {
+				return math.Abs(masFv[i]) < math.Abs(masFv[j])
+			})
+		} else if i == 0 {
+			scalProdFl3 = masFv[i]
+		}
+	}
+	fmt.Println("Скаляр призвед 3:", scalProdFl3)
+	fmt.Println("Число операций:", n3)
+	////////////////////////////////////////////////////////////////
+	y := ulp(1.0) / 2
+	var N1 float64 = float64(n1)
+	var N2 float64 = float64(n2)
+	var N3 float64 = float64(n3)
+	Gn1 := (N1 * y) / (1 - N1*y)
+	Gn2 := (N2 * y) / (1 - N2*y)
+	Gn3 := (N3 * y) / (1 - N3*y)
 
+	var sumAbs float64 = 0.0
+	var scalProdSum float64 = 0.0
+
+	for i := 1; i < len(Fv1); i++ {
+		sumAbs = sumAbs + Fv1[i]*Fv2[i]
+		scalProdSum = scalProdSum + math.Abs(Fv1[i]*Fv2[i])
+	}
+	//scalProdSum1 := scalProdSum * Gn1
+	//scalProdSum2 := scalProdSum * Gn2
+	//scalProdSum3 := scalProdSum * Gn3
+
+	// бегущая ошибка
+	fmt.Println()
+
+	fmt.Println(scalProdSum * Gn1)
+	fmt.Println(scalProdSum * Gn2)
+	fmt.Println(scalProdSum * Gn3)
+
+	// 3 априорные ошибки
+	scalProdApr1 := scalProdFl1 * Gn1
+	scalProdApr2 := scalProdFl2 * Gn2
+	scalProdApr3 := scalProdFl3 * Gn3
+	fmt.Println()
+
+	fmt.Println(Gn1)
+	fmt.Println(Gn2)
+	fmt.Println(Gn3)
+
+	fmt.Println()
+
+	fmt.Println(N1)
+	fmt.Println(N2)
+	fmt.Println(N3)
+
+	fmt.Println()
+
+	fmt.Println(scalProdApr1)
+	fmt.Println(scalProdApr2)
+	fmt.Println(scalProdApr3)
+
+	fmt.Println()
+	fmt.Println()
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+func ulp(x float64) (fot float64) {
 	var x2 string
 	var x1 uint64 = math.Float64bits(x)
-	//fmt.Println(x1)
 	x2 = fmt.Sprintf("%064b", x1)
-	//fmt.Println(x2)
-
 	bin_x := x2[1:12]
-
 	var E_x float64 = 0
 	var s float64 = 1
-
-	//f := math.Inf(1)
-	//fmt.Println(f)
-
-	//fmt.Println(bin_x)
-
-	//strings.Contains("something", "some")
-
 	if bin_x == "00000000000" {
 		var fot float64
 		ULP := math.Pow(2, -1074)
-		//fmt.Println(ULP)
 		fot = ULP
 		return fot
-
 	} else if bin_x == "11111111111" && !strings.Contains(x2[12:], "1") {
 		//1. если после 11 единиц идет 52 нуля, то возвращаяем бескончность
-		//fmt.Println("бесконечность")
-		//var fot float64
-		f := math.Inf(1)
-		fmt.Println(f)
-		//fot := f
-		return f
-
+		return math.Inf(1)
 	} else if bin_x == "11111111111" && strings.Contains(x2[12:], "1") {
 		//2. если после 11 единиц идет хотя-бы 1 единица, то возвращаем NAN
 		fot := math.NaN()
-		//fmt.Println(fot)
 		return fot
-
 	} else {
 		for i := len(bin_x) - 1; i >= 0; i-- {
 			if bin_x[i] == '1' {
@@ -75,104 +209,7 @@ func ulp() (fot float64) {
 			}
 			s *= 2
 		}
-		//fmt.Println(E_x)
-
 		fot := math.Pow(2, E_x-1023-52)
-		//fmt.Println(fot)
 		return fot
-
-		//Sravnebie := new(big.Rat).SetFloat64((y - x) / fot)
-		//fmt.Println(Sravnebie)
 	}
-	//сделать ulp для бесконечности, для всех нулей(sub_normal)
-}
-
-func Rounding() {
-
-	var f float64 = 1.00000005960464488641292746251565404236316680908203125
-	var f1 float32 = 1.00000005960464488641292746251565404236316680908203125
-	var f2 float32 = float32(f)
-	fmt.Println(f1, f2)
-	var x2 string
-	var x1 uint64 = math.Float64bits(x)
-	fmt.Println(x1)
-	x2 = fmt.Sprintf("%032b", x1)
-	fmt.Println(x2)
-}
-
-func Float_ex() {
-
-	a1 := new(big.Float)
-	b1 := new(big.Float)
-	c1 := new(big.Float)
-	st1 := fmt.Sprintf("%.27f\n", float64(a))
-	st2 := fmt.Sprintf("%.26f\n", float64(b))
-	st3 := fmt.Sprintf("%.24f\n", float64(c))
-
-	_, err1 := fmt.Sscan(st1, a1)
-	if err1 != nil {
-		fmt.Println("Sscan: error_a1")
-		return
-	}
-
-	_, err2 := fmt.Sscan(st2, b1)
-	if err2 != nil {
-		fmt.Println("Sscan: error_a2")
-		return
-	}
-
-	_, err3 := fmt.Sscan(st3, c1)
-	if err3 != nil {
-		fmt.Println("Sscan: error_a3")
-		return
-	}
-
-	sum := new(big.Float)
-	sum.Add(a1, b1)
-	fmt.Println(a1, "+", b1, "=", sum)
-	if sum == c1 {
-		fmt.Println(sum, "==", c1)
-	} else {
-		fmt.Println(sum, "!=", c1)
-	}
-
-}
-
-func Rat_ex() {
-
-	a1 := new(big.Rat)
-	b1 := new(big.Rat)
-	c1 := new(big.Rat)
-
-	st1 := fmt.Sprintf("%.27f\n", float64(a))
-	st2 := fmt.Sprintf("%.26f\n", float64(b))
-	st3 := fmt.Sprintf("%.24f\n", float64(c))
-
-	_, err1 := fmt.Sscan(st1, a1)
-	if err1 != nil {
-		fmt.Println("Sscan: error_a1")
-		return
-	}
-
-	_, err2 := fmt.Sscan(st2, b1)
-	if err2 != nil {
-		fmt.Println("Sscan: error_a2")
-		return
-	}
-
-	_, err3 := fmt.Sscan(st3, c1)
-	if err3 != nil {
-		fmt.Println("Sscan: error_a3")
-		return
-	}
-
-	var sum = &big.Rat{}
-	sum.Add(a1, b1)
-	fmt.Println(a1, "+", b1, "=", sum)
-	if sum == c1 {
-		fmt.Println(sum, "==", c1)
-	} else {
-		fmt.Println(sum, "!=", c1)
-	}
-
 }
